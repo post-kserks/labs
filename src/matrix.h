@@ -106,4 +106,21 @@ void print_matrix(Matrix m);
  */
 Matrix matrix_from_array(double* data, int rows, int cols);
 
+
+// src/matrix.h (дополнение)
+
+/**
+ * @brief Находит максимальный элемент в матрице.
+ *
+ * @param m Матрица для поиска
+ * @return double Максимальный элемент матрицы
+ *
+ * @note Если матрица пустая (data == nullptr или размеры нулевые), возвращает 0.0
+ * @example
+ * Matrix m = create_matrix(2, 2);
+ * // Заполнение матрицы...
+ * double max_val = matrix_max(m); // Находит максимальный элемент
+ */
+double matrix_max(Matrix m);
+
 #endif // MATRIX_H

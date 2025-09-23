@@ -173,7 +173,57 @@ void test_matrix_from_array() {
     std::cout << "  ✓ Matrix from array tests passed!" << std::endl;
 }
 
+// src/test.cpp (дополнение)
+
+// Тест поиска максимального значения
+void test_matrix_max() {
+    std::cout << "Testing matrix_max..." << std::endl;
+
+    // Тест 1: Пустая матрица
+    Matrix empty;
+    empty.data = nullptr;
+    empty.rows = 0;
+    empty.cols = 0;
+    assert(matrix_max(empty) == 0.0);
+    std::cout << "  ✓ Empty matrix test passed" << std::endl;
+
+    // Тест 2: Матрица с одним элементом
+    Matrix single = create_matrix(1, 1);
+    single.data[0][0] = 42.5;
+    assert(matrix_max(single) == 42.5);
+    free_matrix(single);
+    std::cout << "  ✓ Single element test passed" << std::endl;
+
+    // Тест 3: Матрица с положительными числами
+    Matrix positive = create_matrix(2, 3);
+    positive.data[0][0] = 1.0; positive.data[0][1] = 5.0; positive.data[0][2] = 3.0;
+    positive.data[1][0] = 2.0; positive.data[1][1] = 4.0; positive.data[1][2] = 6.0;
+    assert(matrix_max(positive) == 6.0);
+    free_matrix(positive);
+    std::cout << "  ✓ Positive numbers test passed" << std::endl;
+
+    // Тест 4: Матрица с отрицательными числами
+    Matrix negative = create_matrix(2, 2);
+    negative.data[0][0] = -5.0; negative.data[0][1] = -2.0;
+    negative.data[1][0] = -3.0; negative.data[1][1] = -1.0;
+    assert(matrix_max(negative) == -1.0);
+    free_matrix(negative);
+    std::cout << "  ✓ Negative numbers test passed" << std::endl;
+
+    // Тест 5: Матрица со смешанными значениями
+    Matrix mixed = create_matrix(3, 2);
+    mixed.data[0][0] = -10.0; mixed.data[0][1] = 15.5;
+    mixed.data[1][0] = 0.0;   mixed.data[1][1] = -5.2;
+    mixed.data[2][0] = 7.3;   mixed.data[2][1] = 20.1;
+    assert(matrix_max(mixed) == 20.1);
+    free_matrix(mixed);
+    std::cout << "  ✓ Mixed values test passed" << std::endl;
+
+    std::cout << "  ✓ matrix_max tests passed!" << std::endl;
+}
+
 // Главная функция тестов
+// src/test.cpp (дополнение в main function)
 int main() {
     std::cout << "Starting matrix library tests..." << std::endl;
     std::cout << "=========================================" << std::endl;
@@ -184,6 +234,7 @@ int main() {
         test_matrix_multiplication();
         test_matrix_transpose();
         test_matrix_from_array();
+        test_matrix_max(); // ← ДОБАВЬТЕ ЭТУ СТРОЧКУ
 
         std::cout << "=========================================" << std::endl;
         std::cout << "All tests passed successfully! ✓" << std::endl;

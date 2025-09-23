@@ -175,3 +175,26 @@ Matrix matrix_from_array(double* data, int rows, int cols) {
 
     return result;
 }
+
+// src/matrix.cpp (дополнение)
+
+double matrix_max(Matrix m) {
+    // Проверка на пустую матрицу
+    if (m.data == nullptr || m.rows <= 0 || m.cols <= 0) {
+        return 0.0;
+    }
+
+    // Инициализируем максимальный значение первым элементом матрицы
+    double max_value = m.data[0][0];
+
+    // Поиск максимального элемента
+    for (int i = 0; i < m.rows; i++) {
+        for (int j = 0; j < m.cols; j++) {
+            if (m.data[i][j] > max_value) {
+                max_value = m.data[i][j];
+            }
+        }
+    }
+
+    return max_value;
+}
