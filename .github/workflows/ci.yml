@@ -1,0 +1,53 @@
+# .github/workflows/ci.yml
+name: Matrix Calculator CI
+
+on: [push, pull_request]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++ doxygen graphviz valgrind
+
+    - name: Build application
+      run: |
+        g++ -std=c++17 -o matrix_app src/matrix.cpp src/main.cpp
+        g++ -std=c++17 -o test_app src/matrix.cpp src/test.cpp
+        echo "Build completed successfully!"
+
+    - name: Run tests
+      run: |
+        echo "Running tests..."
+        ./test_app
+        echo "Tests completed successfully!"
+
+    - name: Generate documentation
+      run: |
+        doxygen Doxyfile
+        echo "Documentation generated!"
+
+    - name: Check for memory leaks with Valgrind
+      run: |
+        echo "Running Valgrind memory check..."
+        valgrind --leak-check=full --error-exitcode=1 ./test_app
+        echo "Memory check passed!"
+
+    - name: Run demo application
+      run: |
+        echo "Running demo..."
+        ./matrix_app
+        echo "Demo completed successfully!"
+
+    - name: Upload documentation as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation
+        path: docs/html/
+        retention-days: 30
