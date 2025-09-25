@@ -106,21 +106,22 @@ void print_matrix(Matrix m);
  */
 Matrix matrix_from_array(double* data, int rows, int cols);
 
-
-// src/matrix.h (дополнение)
-
 /**
- * @brief Находит максимальный элемент в матрице.
+ * @brief Создает матрицу со случайными значениями в заданном диапазоне.
  *
- * @param m Матрица для поиска
- * @return double Максимальный элемент матрицы
+ * @param rows Количество строк (должно быть > 0)
+ * @param cols Количество столбцов (должно быть > 0)
+ * @param min Минимальное значение элемента
+ * @param max Максимальное значение элемента
+ * @return Matrix Матрица со случайными значениями
+ * @throws std::invalid_argument Если rows или cols <= 0, или min > max
  *
- * @note Если матрица пустая (data == nullptr или размеры нулевые), возвращает 0.0
+ * @note Использует std::rand() для генерации случайных чисел
+ * @warning Перед использованием вызовите std::srand() для инициализации ГПСЧ
  * @example
- * Matrix m = create_matrix(2, 2);
- * // Заполнение матрицы...
- * double max_val = matrix_max(m); // Находит максимальный элемент
+ * std::srand(time(0));
+ * Matrix random_mat = matrix_random(3, 3, 0.0, 10.0);
  */
-double matrix_max(Matrix m);
+Matrix matrix_random(int rows, int cols, double min, double max);
 
 #endif // MATRIX_H
