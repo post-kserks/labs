@@ -25,8 +25,7 @@
 ### Компиляция:
 ```bash
 g++ -o matrix_multiplier main.cpp -std=c++11
-
-
+```
 ### Запуск:
 ```bash
 ./matrix_multiplier
