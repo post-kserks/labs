@@ -62,7 +62,7 @@ sudo apt-get install -y g++ doxygen graphviz docker.io make
 ### Сборка проекта
 ```bash
 # Клонирование репозитория
-git clone <repository-url>
+git clone https://github.com/post-kserks/labs/tree/lab2
 cd matrix_calculator
 
 # Сборка с помощью Makefile
@@ -230,7 +230,4 @@ make all-check
 
 Разработано в рамках лабораторной работы по полному циклу разработки ПО.
 
----
 
-**Статус проекта**: ✅ Завершено
-**Последнее обновление**: 2024
