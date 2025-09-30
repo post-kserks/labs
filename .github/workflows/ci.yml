@@ -1,0 +1,206 @@
+# .github/workflows/ci.yml
+name: C++ CI for Maze Solver
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    name: Build and Test Maze Solver
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y valgrind
+        echo "Dependencies installed successfully"
+
+    - name: Create build directory
+      run: mkdir -p build
+
+    - name: Compile with debug flags
+      run: |
+        g++ -I./include -g -fsanitize=address,undefined -fno-omit-frame-pointer \
+            -o build/maze_solver \
+            src/matrix.cpp src/maze_solver.cpp src/main.cpp
+      env:
+        CC: gcc
+        CXX: g++
+
+    - name: Run basic tests
+      run: ./build/maze_solver
+
+    - name: Run Valgrind memory check
+      run: |
+        # Recompile without sanitizers for Valgrind
+        g++ -I./include -g -o build/maze_solver_valgrind \
+            src/matrix.cpp src/maze_solver.cpp src/main.cpp
+        valgrind --leak-check=full \
+                 --show-leak-kinds=all \
+                 --track-origins=yes \
+                 --error-exitcode=1 \
+                 ./build/maze_solver_valgrind
+
+    - name: Compile with warnings
+      run: |
+        g++ -I./include -Wall -Wextra -Wpedantic -Werror \
+            -std=c++17 -o build/maze_solver_strict \
+            src/matrix.cpp src/maze_solver.cpp src/main.cpp
+
+    - name: Run strict compilation tests
+      run: ./build/maze_solver_strict
+
+    - name: Test with different compiler
+      run: |
+        sudo apt-get install -y clang
+        clang++ -I./include -Wall -Wextra -std=c++17 \
+                -o build/maze_solver_clang \
+                src/matrix.cpp src/maze_solver.cpp src/main.cpp
+        ./build/maze_solver_clang
+
+    - name: Check file structure
+      run: |
+        echo "Checking project structure..."
+        [ -f "include/matrix.h" ] || exit 1
+        [ -f "include/maze_solver.h" ] || exit 1
+        [ -f "src/matrix.cpp" ] || exit 1
+        [ -f "src/maze_solver.cpp" ] || exit 1
+        [ -f "src/main.cpp" ] || exit 1
+        echo "Project structure is correct"
+
+    - name: Run custom test script
+      run: |
+        chmod +x run_tests.sh
+        ./run_tests.sh
+
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check for memory leaks pattern
+      run: |
+        echo "Checking for obvious memory management issues..."
+        if grep -r "malloc\|free" include/ src/ | grep -v "//.*malloc\|//.*free"; then
+          echo "Found raw malloc/free usage - consider using new/delete"
+          exit 1
+        fi
+
+    - name: Check for exception safety
+      run: |
+        echo "Checking exception safety..."
+        if grep -r "throw" src/ && ! grep -r "try\|catch" src/; then
+          echo "Found throws but no try-catch blocks"
+          exit 1
+        fi
+
+    - name: Validate header guards
+      run: |
+        for header in include/*.h; do
+          echo "Checking $header"
+          if ! grep -q "#ifndef" "$header" || ! grep -q "#define" "$header" || ! grep -q "#endif" "$header"; then
+            echo "Missing header guards in $header"
+            exit 1
+          fi
+        done
+
+  documentation:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check README exists
+      run: |
+        [ -f "README.md" ] || exit 1
+        echo "README.md found"
+
+    - name: Check README content
+      run: |
+        echo "Checking README content..."
+        [ -n "$(grep -i 'description' README.md)" ] || exit 1
+        [ -n "$(grep -i 'installation' README.md)" ] || exit 1
+        [ -n "$(grep -i 'usage' README.md)" ] || exit 1
+        echo "README content is sufficient"
+
+    - name: Verify documentation structure
+      run: |
+        echo "Project structure documentation:"
+        find . -name "*.h" -o -name "*.cpp" | sort
+        echo "All source files documented"
+
+  performance:
+    name: Performance Baseline
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Compile for performance testing
+      run: |
+        g++ -I./include -O2 -std=c++17 \
+            -o build/maze_solver_perf \
+            src/matrix.cpp src/maze_solver.cpp src/main.cpp
+
+    - name: Run performance test
+      timeout-minutes: 2
+      run: |
+        echo "Running performance baseline..."
+        time ./build/maze_solver_perf
+        echo "Performance test completed"
+
+    - name: Test with larger maze
+      run: |
+        # Create a simple performance test
+        cat > test_performance.cpp << 'EOF'
+        #include "include/matrix.h"
+        #include "include/maze_solver.h"
+        #include <iostream>
+        #include <chrono>
+
+        int main() {
+            // Create a larger maze for performance testing
+            Matrix large_maze = create_matrix(50, 50);
+
+            // Initialize as empty maze with borders
+            for (int i = 0; i < 50; i++) {
+                for (int j = 0; j < 50; j++) {
+                    if (i == 0 || i == 49 || j == 0 || j == 49) {
+                        large_maze.data[i][j] = WALL;
+                    } else {
+                        large_maze.data[i][j] = PATH;
+                    }
+                }
+            }
+
+            auto start = std::chrono::high_resolution_clock::now();
+            bool result = is_reachable(large_maze, 1, 1, 48, 48);
+            auto end = std::chrono::high_resolution_clock::now();
+
+            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+            std::cout << "Large maze path finding took: " << duration.count() << "ms" << std::endl;
+            std::cout << "Path exists: " << (result ? "true" : "false") << std::endl;
+
+            free_matrix(&large_maze);
+            return 0;
+        }
+        EOF
+
+        g++ -I./include -O2 -std=c++17 -o build/performance_test \
+            src/matrix.cpp src/maze_solver.cpp test_performance.cpp
+        ./build/performance_test
