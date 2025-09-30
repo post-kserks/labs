@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/seminar4.dir/main.cpp.o CMakeFiles/seminar4.dir/helpers.cpp.o CMakeFiles/seminar4.dir/tasks/task1.cpp.o CMakeFiles/seminar4.dir/tasks/task2.cpp.o CMakeFiles/seminar4.dir/tasks/task3.cpp.o CMakeFiles/seminar4.dir/tasks/task4.cpp.o CMakeFiles/seminar4.dir/tasks/task5.cpp.o CMakeFiles/seminar4.dir/tasks/task6.cpp.o -o seminar4 

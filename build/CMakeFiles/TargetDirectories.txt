@@ -1,0 +1,3 @@
+/home/golem/bmstu/labs/build/CMakeFiles/seminar4.dir
+/home/golem/bmstu/labs/build/CMakeFiles/edit_cache.dir
+/home/golem/bmstu/labs/build/CMakeFiles/rebuild_cache.dir
