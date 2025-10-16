@@ -1,20 +1,21 @@
+# Makefile для компиляции проекта
+
 CXX = g++
-CXXFLAGS = -std=c++11 -Iinclude
-SRCDIR = src
-OBJDIR = obj
+CXXFLAGS = -std=c++11 -Wall -Wextra -O2
+LDFLAGS = -lm
+TARGET = nonlinear_solver
+SOURCES = main.cpp
+HEADERS = math_utils.h equation_systems.h bisection_method.h iteration_method.h newton_method.h results_table.h
 
-SOURCES = $(SRCDIR)/main.cpp $(SRCDIR)/bisection.cpp $(SRCDIR)/iteration.cpp $(SRCDIR)/newton.cpp
-OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
-TARGET = lab4
+all: $(TARGET)
 
-$(TARGET): $(OBJECTS)
-	$(CXX) $(OBJECTS) -o $(TARGET)
-
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	@mkdir -p $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(TARGET): $(SOURCES) $(HEADERS)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SOURCES) $(LDFLAGS)
 
 clean:
-	rm -rf $(OBJDIR) $(TARGET)
+	rm -f $(TARGET) *.o *.csv
 
-.PHONY: clean
+run: $(TARGET)
+	./$(TARGET)
+
+.PHONY: all clean run
