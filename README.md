@@ -29,7 +29,7 @@
 ## Постановка задачи
 
 ### Исходное уравнение
-**Уравнение варианта 24**: 
+**Уравнение варианта 24**:
 ```cpp
 // Файл: equation_systems.h
 double equation_24(double x) {
@@ -67,17 +67,17 @@ const double EPSILON_2 = 0.00000000001; // ε < 0.00000000001
 bool check_bolzano_condition(double (*func)(double), double a, double b, const char** error_msg) {
     double fa = func(a);
     double fb = func(b);
-    
+
     if (!is_valid_number(fa) || !is_valid_number(fb)) {
         *error_msg = "Функция возвращает нечисловое значение на границах интервала";
         return false;
     }
-    
+
     if (fa * fb > 0) {
         *error_msg = "На границах интервала функция имеет одинаковые знаки";
         return false;
     }
-    
+
     return true;
 }
 ```
@@ -89,7 +89,7 @@ for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
     // Вычисление середины интервала
     c = (a + b) / 2.0;  // ← ВОТ ЗДЕСЬ ВЫЧИСЛЯЕТСЯ СЕРЕДИНА
     fc = func(c);
-    
+
     // Проверка точности по значению функции
     if (std::fabs(fc) < epsilon) {  // ← КРИТЕРИЙ ОСТАНОВКИ 1
         result.root = c;
@@ -99,7 +99,7 @@ for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
         result.converged = true;
         return result;
     }
-    
+
     // Проверка точности по длине интервала
     if ((b - a) < 2.0 * epsilon) {  // ← КРИТЕРИЙ ОСТАНОВКИ 2
         result.root = c;
@@ -109,7 +109,7 @@ for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
         result.converged = true;
         return result;
     }
-    
+
     // Выбор нового интервала
     if (fa * fc < 0) {
         b = c;
@@ -145,21 +145,21 @@ bool check_contraction_condition(double (*phi)(double), double a, double b, doub
     const int SAMPLES = 100;
     double step = (b - a) / (SAMPLES - 1);
     double max_phi_prime = 0.0;
-    
+
     for (int i = 0; i < SAMPLES; i++) {
         double x = a + i * step;
         double phi_prime = numerical_phi_derivative(phi, x);
-        
+
         if (!is_valid_number(phi_prime)) {
             return false;
         }
-        
+
         double abs_phi_prime = std::fabs(phi_prime);
         if (abs_phi_prime > max_phi_prime) {
             max_phi_prime = abs_phi_prime;
         }
     }
-    
+
     *max_derivative = max_phi_prime;
     return (max_phi_prime < 1.0);  // ← ПРОВЕРКА УСЛОВИЯ СЖАТИЯ
 }
@@ -171,12 +171,12 @@ bool check_contraction_condition(double (*phi)(double), double a, double b, doub
 for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
     // Вычисление нового приближения
     x_current = phi(x_prev);  // ← ОСНОВНАЯ ФОРМУЛА МЕТОДА
-    
+
     // Проверка критериев остановки
     double delta = std::fabs(x_current - x_prev);
     double f_current = func(x_current);
     double residual = std::fabs(f_current);
-    
+
     // Проверка сходимости по изменению приближения
     if (delta < epsilon) {  // ← КРИТЕРИЙ ОСТАНОВКИ 1
         result.root = x_current;
@@ -186,7 +186,7 @@ for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
         result.converged = true;
         return result;
     }
-    
+
     // Проверка сходимости по значению функции
     if (residual < epsilon) {  // ← КРИТЕРИЙ ОСТАНОВКИ 2
         result.root = x_current;
@@ -196,7 +196,7 @@ for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
         result.converged = true;
         return result;
     }
-    
+
     x_prev = x_current;
 }
 ```
@@ -220,21 +220,21 @@ for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
     // Вычисление функции и производной в текущей точке
     f_prev = func(x_prev);
     f_deriv_prev = derivative(x_prev);
-    
+
     // Проверка что производная не равна нулю
     if (is_zero(f_deriv_prev, 1e-15)) {
         result.error_msg = "Производная слишком близка к нулю - деление на ноль";
         return result;
     }
-    
+
     // Вычисление нового приближения по формуле Ньютона
     x_current = x_prev - f_prev / f_deriv_prev;  // ← ОСНОВНАЯ ФОРМУЛА НЬЮТОНА
-    
+
     // Вычисление критериев остановки
     double delta = std::fabs(x_current - x_prev);
     double f_current = func(x_current);
     double residual = std::fabs(f_current);
-    
+
     // Проверка сходимости по изменению приближения
     if (delta < epsilon) {  // ← КРИТЕРИЙ ОСТАНОВКИ 1
         result.root = x_current;
@@ -244,7 +244,7 @@ for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
         result.converged = true;
         return result;
     }
-    
+
     // Проверка сходимости по значению функции
     if (residual < epsilon) {  // ← КРИТЕРИЙ ОСТАНОВКИ 2
         result.root = x_current;
@@ -254,7 +254,7 @@ for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
         result.converged = true;
         return result;
     }
-    
+
     x_prev = x_current;
 }
 ```
@@ -303,11 +303,11 @@ double x0 = (interval.a + interval.b) / 2.0;
 double choose_newton_initial_guess(double (*func)(double), double a, double b) {
     double fa = func(a);
     double fb = func(b);
-    
+
     // Вычисляем вторые производные в граничных точках
     double f2a = numerical_second_derivative(func, a);
     double f2b = numerical_second_derivative(func, b);
-    
+
     // Правило: выбираем тот конец, где f(x) × f''(x) > 0
     if (fa * f2a > 0) {
         return a;
@@ -382,10 +382,10 @@ struct SolutionResult {
 // Файл: results_table.h
 void export_results_to_csv(const vector<ExperimentResult>& results, const string& filename) {
     ofstream file(filename);
-    
+
     // Добавляем BOM для корректного отображения в Excel
     file << "\xEF\xBB\xBF";
-    
+
     // Заголовок CSV с разделителем ";" (точка с запятой)
     file << "Method" << ";"
          << "Epsilon" << ";"
@@ -395,7 +395,7 @@ void export_results_to_csv(const vector<ExperimentResult>& results, const string
          << "Iterations" << ";"
          << "Converged" << ";"
          << "Status" << endl;
-    
+
     // Данные
     for (const auto& result : results) {
         file << escape_csv_field(result.method_name) << ";"
@@ -407,7 +407,7 @@ void export_results_to_csv(const vector<ExperimentResult>& results, const string
              << (result.converged ? "Yes" : "No") << ";"
              << escape_csv_field(result.status) << endl;
     }
-    
+
     file.close();
 }
 ```
@@ -449,7 +449,7 @@ g++ -std=c++11 -Wall -Wextra -O2 -o nonlinear_solver main.cpp -lm
 После запуска программы создаются три файла:
 
 1. **`nonlinear_equation_results.csv`** - результаты в формате CSV
-2. **`nonlinear_equation_results.tsv`** - результаты в формате TSV  
+2. **`nonlinear_equation_results.tsv`** - результаты в формате TSV
 3. **`nonlinear_equation_report.txt`** - читаемый текстовый отчет
 
 ### Очистка
@@ -461,127 +461,75 @@ make clean
 
 ### 1. Почему выбран именно интервал [1, 2]?
 **Ответ**: Интервал выбран на основе анализа функции:
-```cpp
-// f(1) = 1 - e + 2 ≈ 0.2817 > 0
-// f(2) = 4 - e² + 2 ≈ -1.3891 < 0  
-// f(1) × f(2) < 0 → выполняется условие Больцано-Коши
-```
-
-**Код проверки**:
-```cpp
-// Файл: bisection_method.h
-if (fa * fb > 0) {
-    result.error_msg = "На границах интервала функция имеет одинаковые знаки";
-    return false;
-}
-```
+- f(1) = 1 - e + 2 ≈ 0.2817 > 0
+- f(2) = 4 - e² + 2 ≈ -1.3891 < 0
+- f(1) × f(2) < 0 → выполняется условие Больцано-Коши
+- Корень гарантированно существует в этом интервале
 
 ### 2. Почему для метода итераций использовано преобразование x = ln(x² + 2)?
-**Ответ**: Рассматривались два преобразования. Выбрано второе, потому что:
+**Ответ**: Рассматривались два преобразования:
+1. x = √(eˣ - 2) - имеет ограниченную область определения (только при x ≥ ln2)
+2. x = ln(x² + 2) - определено для всех x ∈ ℝ
 
-```cpp
-// Файл: equation_systems.h
-double equation_24_phi(double x) {
-    // Преобразование: x = ln(x² + 2)
-    return std::log(x*x + 2);
-}
-```
-
-**Проверка условия сходимости**:
-```cpp
-// Файл: iteration_method.h
-bool is_contraction = check_contraction_condition(system.phi, interval.a, interval.b, &max_derivative);
-// max|φ'(x)| ≈ 0.666 < 1 на [1, 2] → условие выполняется
-```
+Второе преобразование было выбрано потому что:
+- Оно определено на всем интервале [1, 2]
+- |φ'(x)| = |2x/(x² + 2)| < 1 на [1, 2] (максимум ≈ 0.666)
+- Условие сходимости выполняется
 
 ### 3. Почему начальное приближение для метода Ньютона x₀ = 2.0?
 **Ответ**: Начальное приближение выбрано по правилу:
-```cpp
-// Файл: newton_method.h
-// Правило: выбираем тот конец, где f(x) × f''(x) > 0
-if (fa * f2a > 0) {
-    return a;
-} else if (fb * f2b > 0) {
-    return b;  // ← ВЫБРАН x₀ = 2.0
-}
-```
+- f(1) > 0, f''(1) < 0 → f(1)×f''(1) < 0
+- f(2) < 0, f''(2) < 0 → f(2)×f''(2) > 0
+- Выбираем тот конец, где f(x)×f''(x) > 0 → x₀ = 2.0
 
-### 4. Где реализованы критерии остановки?
-**Ответ**: Во всех трех методах используются одинаковые критерии:
+Это правило обеспечивает монотонную сходимость метода Ньютона.
 
-**Критерий по значению функции**:
-```cpp
-if (std::fabs(fc) < epsilon) {  // метод бисекции
-if (residual < epsilon) {       // методы итераций и Ньютона
-```
+### 4. Почему метод Ньютона показал наилучший результат?
+**Ответ**: Метод Ньютона имеет квадратичную скорость сходимости, в то время как:
+- Метод бисекции: линейная сходимость (коэффициент 1/2)
+- Метод итераций: линейная сходимость (коэффициент q ≈ 0.666)
 
-**Критерий по изменению аргумента**:
-```cpp
-if ((b - a) < 2.0 * epsilon) {  // метод бисекции  
-if (delta < epsilon) {          // методы итераций и Ньютона
-```
+Квадратичная сходимость означает, что количество верных цифр удваивается на каждой итерации.
 
-### 5. Как обеспечивается защита от бесконечных циклов?
-**Ответ**: Во всех методах:
-```cpp
-const int MAX_ITERATIONS = 1000;
+### 5. Как обеспечивалась точность вычислений?
+**Ответ**: Были приняты следующие меры:
+- Использование типа `double` (точность ~15-17 знаков)
+- Сравнение чисел с плавающей точкой с учетом машинного эпсилона
+- Двойной критерий остановки (по функции и по аргументу)
+- Защита от накопления ошибок округления
 
-for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
-    // ... если не сошлись за 1000 итераций, выходим ...
-}
+### 6. Почему метод простых итераций потребовал больше итераций, чем метод бисекции?
+**Ответ**: Несмотря на то, что оба метода имеют линейную сходимость:
+- Метод бисекции: коэффициент сходимости 0.5
+- Метод итераций: коэффициент сходимости max|φ'(x)| ≈ 0.666
 
-// После цикла:
-result.error_msg = "Превышено максимальное количество итераций";
-```
+Меньший коэффициент сходимости означает более быструю сходимость, поэтому метод бисекции оказался эффективнее метода итераций для данного уравнения.
 
-### 6. Как обрабатываются особые случаи?
-**Ответ**: Реализованы проверки:
+### 7. Есть ли у уравнения другие корни?
+**Ответ**: Проведенный анализ показывает:
+- При x → -∞: x² → +∞, eˣ → 0, f(x) → +∞
+- При x → +∞: x² → +∞, eˣ → +∞, но eˣ растет быстрее, поэтому f(x) → -∞
+- f(0) = 0 - 1 + 2 = 1 > 0
+- f(1) > 0, f(2) < 0 → один корень в [1, 2]
+- f(x) монотонно убывает при x > 0.5 (f'(x) = 2x - eˣ < 0)
+- Следовательно, уравнение имеет ровно один действительный корень
 
-**Деление на ноль в методе Ньютона**:
-```cpp
-if (is_zero(f_deriv_prev, 1e-15)) {
-    result.error_msg = "Производная слишком близка к нулю";
-    return result;
-}
-```
+### 8. Какова реальная достигнутая точность?
+**Ответ**: Для метода Ньютона при ε = 10⁻¹¹:
+- |f(x)| ≈ 10⁻¹² ÷ 10⁻¹⁶
+- |Δx| ≈ 10⁻¹¹
+- Реальная точность превышает требуемую ε₂ = 10⁻¹¹
 
-**Некорректные числовые значения**:
-```cpp
-if (!is_valid_number(fc)) {
-    result.error_msg = "Функция возвращает нечисловое значение";
-    return result;
-}
-```
+### 9. Почему использованы именно эти критерии остановки?
+**Ответ**: Двойной критерий остановки обеспечивает надежность:
+1. **|f(xₙ)| < ε** - гарантирует, что значение функции близко к нулю
+2. **|xₙ₊₁ - xₙ| < ε** - гарантирует, что приближения стабилизировались
 
-### 7. Как вычисляется погрешность для каждого метода?
-**Ответ**: Для каждого метода по-разному:
+Использование только одного критерия может привести к преждевременной остановке или лишним итерациям.
 
-**Метод бисекции**:
-```cpp
-result.error_estimate = (b - a) / 2.0;  // половина длины интервала
-```
-
-**Методы итераций и Ньютона**:
-```cpp
-result.error_estimate = delta;  // разность между последовательными приближениями
-```
-
-### 8. Где находится основной алгоритм сравнения методов?
-**Ответ**: В файле `results_table.h`:
-```cpp
-void analyze_and_export_equation() {
-    // Решение с первой точностью
-    SolutionResult bisection_eps1 = bisection_method(...);
-    SolutionResult iteration_eps1 = iteration_analysis(...);
-    SolutionResult newton_eps1 = newton_analysis(...);
-    
-    // Решение со второй точностью  
-    SolutionResult bisection_eps2 = bisection_method(...);
-    SolutionResult iteration_eps2 = iteration_analysis(...);
-    SolutionResult newton_eps2 = newton_analysis(...);
-    
-    // Экспорт результатов
-    export_results_to_csv(results, csv_filename);
-}
-```
-
+### 10. Какие меры приняты для избежания бесконечных циклов?
+**Ответ**: Реализованы следующие защиты:
+- Ограничение максимального числа итераций (1000)
+- Проверка условия сходимости перед запуском методов
+- Обнаружение расходимости (слишком большие изменения)
+- Проверка на NaN и бесконечности
