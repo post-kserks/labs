@@ -12,7 +12,7 @@
 ### 1. Сохраните незакоммиченные изменения (если есть)
 ```bash
 git stash push -m "WIP before creating empty branch"
-
+```
 
 ### 2. Создайте новую пустую ветку
 
@@ -125,3 +125,4 @@ git config --global user.email "you@example.com"
 
 Хочешь, я вставлю в него твоё имя или ник, чтобы файл выглядел как оформленный проектный README?
 ```
+
