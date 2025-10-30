@@ -1,15 +1,22 @@
+# Компилятор и флаги
 CXX = g++
-CXXFLAGS = -Wall -Wextra -O2 -std=c++11
-TARGET = lab6_jordan_gauss
-SOURCES = main.cpp matrix_operations.cpp jordan_gauss.cpp io_operations.cpp validation.cpp
-HEADERS = matrix_operations.h jordan_gauss.h io_operations.h validation.h
+CXXFLAGS = -Wall -Wextra -std=c++11
 
-$(TARGET): $(SOURCES) $(HEADERS)
+# Имя исполняемого файла
+TARGET = slau_solver
+
+# Исходные файлы
+SOURCES = main.cpp jordan_gauss.cpp
+
+# Сборка проекта
+$(TARGET): $(SOURCES)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SOURCES)
 
+# Очистка
 clean:
 	rm -f $(TARGET)
 
+# Запуск
 run: $(TARGET)
 	./$(TARGET)
 
