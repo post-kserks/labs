@@ -1,69 +1,100 @@
+#include "jordan_gauss.h"
 #include <iostream>
-#include <vector>
 #include <iomanip>
 #include <cmath>
 #include <stdexcept>
-#include "jordan_gauss.h"
+
+using namespace std;
+
+// Вывод матрицы в читаемом формате
+void printMatrix(const vector<vector<double>>& matrix) {
+    int rows = matrix.size();
+    if (rows == 0) return;
+
+    int cols = matrix[0].size();
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            cout << setw(8) << matrix[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
 
 // Реализация метода Жордана-Гаусса
-std::vector<double> solveJordanGauss(std::vector<std::vector<double>> matrix) {
-    int n = matrix.size(); // Количество уравнений
+vector<double> solveJordanGauss(vector<vector<double>> matrix) {
+    int rows = matrix.size();
+    if (rows == 0) {
+        throw runtime_error("Матрица пустая");
+    }
 
-    // Прямой ход метода Жордана-Гаусса
-    for (int i = 0; i < n; i++) {
-        // Поиск максимального элемента в столбце для устойчивости
-        int max_row = i;
-        for (int k = i + 1; k < n; k++) {
-            if (std::abs(matrix[k][i]) > std::abs(matrix[max_row][i])) {
-                max_row = k;
+    int cols = matrix[0].size();
+
+    // Проверяем, что матрица имеет правильный размер (n x n+1)
+    if (cols != rows + 1) {
+        throw runtime_error("Неверный размер матрицы");
+    }
+
+    for (int i = 0; i < rows; i++) {
+        // Поиск ведущего элемента (максимального по модулю в столбце)
+        int maxRow = i;
+        for (int k = i + 1; k < rows; k++) {
+            if (abs(matrix[k][i]) > abs(matrix[maxRow][i])) {
+                maxRow = k;
             }
         }
 
         // Перестановка строк для обеспечения устойчивости
-        if (max_row != i) {
-            std::swap(matrix[i], matrix[max_row]);
+        if (maxRow != i) {
+            swap(matrix[i], matrix[maxRow]);
         }
 
-        // Проверка на вырожденность системы
-        if (std::abs(matrix[i][i]) < 1e-10) {
-            throw std::runtime_error("Система вырождена или не имеет единственного решения");
+        // Нормализация текущей строки
+        double divisor = matrix[i][i];
+        if (abs(divisor) < 1e-10) {
+            throw runtime_error("Система вырождена или не имеет единственного решения");
         }
 
-        // Нормализация i-ой строки (делаем диагональный элемент равным 1)
-        double pivot = matrix[i][i];
-        for (int j = i; j <= n; j++) {
-            matrix[i][j] /= pivot;
+        for (int j = i; j < cols; j++) {
+            matrix[i][j] /= divisor;
         }
 
-        // Обнуление i-ого столбца в других строках
-        for (int k = 0; k < n; k++) {
+        // Исключение переменной из других строк
+        for (int k = 0; k < rows; k++) {
             if (k != i) {
                 double factor = matrix[k][i];
-                for (int j = i; j <= n; j++) {
+                for (int j = i; j < cols; j++) {
                     matrix[k][j] -= factor * matrix[i][j];
                 }
             }
         }
     }
 
-    // Извлечение решения из последнего столбца
-    std::vector<double> solution(n);
-    for (int i = 0; i < n; i++) {
-        solution[i] = matrix[i][n];
+    // Извлекаем решения из последнего столбца
+    vector<double> solution(rows);
+    for (int i = 0; i < rows; i++) {
+        solution[i] = matrix[i][cols - 1];
     }
 
     return solution;
 }
 
-// Функция для вывода матрицы
-void printMatrix(const std::vector<std::vector<double>>& matrix) {
-    for (const auto& row : matrix) {
-        for (size_t j = 0; j < row.size(); j++) {
-            std::cout << std::setw(8) << std::fixed << std::setprecision(2) << row[j];
-            if (j == row.size() - 2) {
-                std::cout << " |"; // Разделитель для расширенной матрицы
-            }
-        }
-        std::cout << std::endl;
+// Вывод решений системы с именами x, y, z
+void printSolution(const vector<double>& solution) {
+    int size = solution.size();
+
+    if (size >= 1) {
+        cout << "x = " << solution[0] << endl;
+    }
+    if (size >= 2) {
+        cout << "y = " << solution[1] << endl;
+    }
+    if (size >= 3) {
+        cout << "z = " << solution[2] << endl;
+    }
+
+    // Для систем большего размера продолжаем нумерацию
+    for (int i = 3; i < size; i++) {
+        cout << "x" << i + 1 << " = " << solution[i] << endl;
     }
 }
