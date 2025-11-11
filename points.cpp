@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cfloat>
 
-// ---------- Расстояние между двумя точками ----------
+// Расстояние между двумя точками
 static double dist(const Point& a, const Point& b) {
     double dx = a.x - b.x;
     double dy = a.y - b.y;
@@ -10,62 +10,80 @@ static double dist(const Point& a, const Point& b) {
 }
 
 // ---------- Метод грубой силы ----------
-double bruteForceClosest(const std::vector<Point>& points) {
-    double minDist = DBL_MAX;
-    int n = points.size();
-    for (int i = 0; i < n; i++) {
+double bruteForceClosest(const std::vector<Point>& P) {
+    double d = DBL_MAX;
+    int n = P.size();
+    for (int i = 0; i < n - 1; i++) {
         for (int j = i + 1; j < n; j++) {
-            double d = dist(points[i], points[j]);
-            if (d < minDist) minDist = d;
+            double dij = dist(P[i], P[j]);
+            if (dij < d) d = dij;
         }
     }
-    return minDist;
+    return d;
 }
 
-// ---------- Вспомогательная функция ----------
-static double stripClosest(std::vector<Point>& strip, double d) {
-    double minD = d;
-    int n = strip.size();
-    for (int i = 0; i < n; i++) {
-        for (int j = i + 1; j < n && (strip[j].y - strip[i].y) < minD; j++) {
-            minD = std::min(minD, dist(strip[i], strip[j]));
-        }
+// ---------- Merge по псевдокоду (для точек, сортировка по y) ----------
+static void mergeByY(std::vector<Point>& A, int p, int q, int r) {
+    int n1 = q - p + 1;
+    int n2 = r - q;
+    std::vector<Point> L(n1), R(n2);
+    for (int i = 0; i < n1; i++) L[i] = A[p + i];
+    for (int j = 0; j < n2; j++) R[j] = A[q + 1 + j];
+
+    int i = 0, j = 0, k = p;
+    while (i < n1 && j < n2) {
+        if (L[i].y <= R[j].y) A[k++] = L[i++];
+        else A[k++] = R[j++];
     }
-    return minD;
+    while (i < n1) A[k++] = L[i++];
+    while (j < n2) A[k++] = R[j++];
 }
 
-// ---------- Рекурсивный метод декомпозиции ----------
-static double closestRec(std::vector<Point>& ptsX, std::vector<Point>& ptsY) {
-    int n = ptsX.size();
-    if (n <= 3) return bruteForceClosest(ptsX);
+// ---------- Рекурсивный алгоритм декомпозиции ----------
+static double closestRec(std::vector<Point>& Px, std::vector<Point>& Py) {
+    int n = Px.size();
+    if (n <= 3)
+        return bruteForceClosest(Px);
 
     int mid = n / 2;
-    Point midPoint = ptsX[mid];
+    Point midPoint = Px[mid];
 
-    std::vector<Point> leftX(ptsX.begin(), ptsX.begin() + mid);
-    std::vector<Point> rightX(ptsX.begin() + mid, ptsX.end());
+    std::vector<Point> Qx(Px.begin(), Px.begin() + mid);
+    std::vector<Point> Rx(Px.begin() + mid, Px.end());
+    std::vector<Point> Qy, Ry;
 
-    std::vector<Point> leftY, rightY;
-    for (auto& p : ptsY) {
-        if (p.x <= midPoint.x) leftY.push_back(p);
-        else rightY.push_back(p);
+    for (auto& p : Py) {
+        if (p.x <= midPoint.x)
+            Qy.push_back(p);
+        else
+            Ry.push_back(p);
     }
 
-    double dl = closestRec(leftX, leftY);
-    double dr = closestRec(rightX, rightY);
-    double d = std::min(dl, dr);
+    double dL = closestRec(Qx, Qy);
+    double dR = closestRec(Rx, Ry);
+    double d = std::min(dL, dR);
 
     std::vector<Point> strip;
-    for (auto& p : ptsY)
+    for (auto& p : Py)
         if (fabs(p.x - midPoint.x) < d)
             strip.push_back(p);
 
-    return std::min(d, stripClosest(strip, d));
+    double minStrip = d;
+    for (int i = 0; i < strip.size(); i++) {
+        for (int j = i + 1; j < strip.size() && (strip[j].y - strip[i].y) < minStrip; j++) {
+            double dij = dist(strip[i], strip[j]);
+            if (dij < minStrip)
+                minStrip = dij;
+        }
+    }
+    return std::min(d, minStrip);
 }
 
-double divideAndConquerClosest(std::vector<Point> points) {
-    std::vector<Point> ptsY = points;
-    std::sort(points.begin(), points.end(), [](auto& a, auto& b){ return a.x < b.x; });
-    std::sort(ptsY.begin(), ptsY.end(), [](auto& a, auto& b){ return a.y < b.y; });
-    return closestRec(points, ptsY);
+// ---------- Главная функция ----------
+double divideAndConquerClosest(std::vector<Point> P) {
+    std::vector<Point> Px = P;
+    std::vector<Point> Py = P;
+    std::sort(Px.begin(), Px.end(), [](auto& a, auto& b){ return a.x < b.x; });
+    std::sort(Py.begin(), Py.end(), [](auto& a, auto& b){ return a.y < b.y; });
+    return closestRec(Px, Py);
 }

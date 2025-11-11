@@ -6,8 +6,6 @@ struct Point {
     double x, y;
 };
 
-// Метод грубой силы
-double bruteForceClosest(const std::vector<Point>& points);
-
-// Метод декомпозиции (разделяй и властвуй)
-double divideAndConquerClosest(std::vector<Point> points);
+// Поиск ближайшей пары точек
+double bruteForceClosest(const std::vector<Point>& P);
+double divideAndConquerClosest(std::vector<Point> P);

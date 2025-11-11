@@ -1,11 +1,7 @@
 #pragma once
 #include <vector>
 
-// Сортировка выбором
-void selectionSort(std::vector<int>& arr);
-
-// Пузырьковая сортировка
-void bubbleSort(std::vector<int>& arr);
-
-// Сортировка слиянием
-void mergeSort(std::vector<int>& arr);
+// Псевдокоды из лабораторной
+void selectionSort(std::vector<int>& A);
+void bubbleSort(std::vector<int>& A);
+void mergeSort(std::vector<int>& A);
