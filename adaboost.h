@@ -46,7 +46,4 @@ double predict_adaboost(const std::vector<WeakClassifier>& classifiers,
 double calculate_auc(const std::vector<WeakClassifier>& classifiers,
                      const std::vector<Transaction>& test_data);
 
-// Тестирование производительности
-void test_adaboost_performance(int num_samples, int num_classifiers);
-
 #endif
