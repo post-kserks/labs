@@ -1,0 +1,12 @@
+# Object files
+*.o
+
+# Data files
+*.csv
+
+# Executables
+lab_variant16
+test_quick
+
+# System files
+.DS_Store
