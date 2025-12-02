@@ -51,15 +51,6 @@ static int canonical_disagreement(const std::vector<int>& seq) {
     return disagreements;
 }
 
-// Перемешивание/создание случайного начального порядка (используется для SA/HC)
-static std::vector<int> random_permutation() {
-    int n = (int)TOPICS.size();
-    std::vector<int> s(n);
-    for (int i = 0; i < n; ++i) s[i] = i;
-    std::shuffle(s.begin(), s.end(), rng);
-    return s;
-}
-
 // Конвертация последовательности в строку с названиями тем
 std::string seq_to_string(const std::vector<int>& seq) {
     std::ostringstream oss;
