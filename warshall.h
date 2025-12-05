@@ -25,7 +25,7 @@ void warshall(int graph[MAX_USERS][MAX_USERS], int n) {
 
 // Определение степени знакомства между двумя пользователями
 // Использует BFS (поиск в ширину) для нахождения кратчайшего пути
-int степень_знакомства(int graph[MAX_USERS][MAX_USERS], int n, int user1, int user2) {
+int familiarity_degree(int graph[MAX_USERS][MAX_USERS], int n, int user1, int user2) {
     if (user1 == user2) return 0;
     if (graph[user1][user2]) return 1;  // Прямая связь
     
@@ -93,7 +93,7 @@ void demo_familiarity(int graph[MAX_USERS][MAX_USERS], int n) {
     for (int i = 0; i < num_pairs && pairs[i][0] < n && pairs[i][1] < n; i++) {
         int user1 = pairs[i][0];
         int user2 = pairs[i][1];
-        int degree = степень_знакомства(graph, n, user1, user2);
+        int degree = familiarity_degree(graph, n, user1, user2);
         
         printf("  Пользователи %d и %d: ", user1, user2);
         if (degree == -1) {
