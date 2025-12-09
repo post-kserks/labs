@@ -71,66 +71,53 @@ void analyze_spread_speed(int total_reached, int n, int num_steps) {
 }
 
 // Определение ключевых инфлюенсеров
-// Запускаем распространение от каждого пользователя и смотрим, кто охватывает больше всего
+// Запускаем распространение от каждого пользователя и учитываем скорость распространения
 void find_influencers(int graph[MAX_USERS][MAX_USERS], int n) {
     printf("\nОпределение ключевых инфлюенсеров...\n");
     printf("(запускаем симуляцию от каждого пользователя)\n\n");
-    
-    int reach[MAX_USERS];
-    
+
+    struct Influencer {
+        int user;      // номер пользователя
+        int total;     // общее количество охваченных
+        int steps;     // количество шагов до стабилизации (меньше = быстрее)
+    };
+    Influencer inf[MAX_USERS];
+
     // Тестируем каждого пользователя как начального
     for (int i = 0; i < n; i++) {
-        int infected[MAX_USERS] = {0};
-        int new_infected[MAX_USERS] = {0};
-        
-        infected[i] = 1;
-        int total = 1;
-        
-        int changed = 1;
-        while (changed) {
-            changed = 0;
-            
-            for (int j = 0; j < n; j++) {
-                if (infected[j]) {
-                    for (int k = 0; k < n; k++) {
-                        if (graph[j][k] && !infected[k] && !new_infected[k]) {
-                            new_infected[k] = 1;
-                            changed = 1;
-                        }
-                    }
-                }
-            }
-            
-            for (int j = 0; j < n; j++) {
-                if (new_infected[j]) {
-                    infected[j] = 1;
-                    new_infected[j] = 0;
-                    total++;
-                }
-            }
+        int steps_arr[MAX_USERS] = {0};
+        int total = simulate_spread(graph, n, i, steps_arr);
+        // определяем последний шаг, когда произошли новые заражения
+        int last_step = 0;
+        for (int s = 0; s < MAX_USERS; s++) {
+            if (steps_arr[s] > 0) last_step = s;
         }
-        
-        reach[i] = total;
+        inf[i] = {i, total, last_step};
     }
-    
-    // Находим топ-3 инфлюенсера
-    printf("Топ инфлюенсеров (по максимальному охвату):\n");
-    for (int rank = 0; rank < 3 && rank < n; rank++) {
-        int max_reach = -1;
-        int max_user = -1;
-        
-        for (int i = 0; i < n; i++) {
-            if (reach[i] > max_reach) {
-                max_reach = reach[i];
-                max_user = i;
+
+    // Сортируем инфлюенсеров: сначала по меньшему количеству шагов, затем по большему охвату
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            bool better = false;
+            if (inf[j].steps < inf[i].steps) {
+                better = true;
+            } else if (inf[j].steps == inf[i].steps && inf[j].total > inf[i].total) {
+                better = true;
+            }
+            if (better) {
+                Influencer tmp = inf[i];
+                inf[i] = inf[j];
+                inf[j] = tmp;
             }
         }
-        
-        if (max_user != -1) {
-            printf("  %d. Пользователь %d - охват %d человек (%.1f%%)\n", 
-                   rank + 1, max_user, max_reach, 100.0 * max_reach / n);
-            reach[max_user] = -1;  // Исключаем из следующего поиска
-        }
+    }
+
+    // Выводим всех инфлюенсеров
+    printf("Список инфлюенсеров (по скорости распространения, затем охвату):\n");
+    for (int rank = 0; rank < n; rank++) {
+        Influencer cur = inf[rank];
+        printf("  %d. Пользователь %d - охват %d человек (%.1f%%), шагов %d\n",
+               rank + 1, cur.user, cur.total, 100.0 * cur.total / n, cur.steps);
     }
 }
 
