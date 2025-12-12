@@ -31,3 +31,4 @@ void runFullTest();
 void printResults(const std::vector<std::pair<int, std::vector<TestResult>>>& results);
 
 #endif // TEST_SORTS_H
+

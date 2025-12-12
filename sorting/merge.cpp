@@ -71,3 +71,4 @@ void mergeSortHelper(std::vector<int>& arr, int left, int right) {
         merge(arr, left, mid, right);
     }
 }
+
